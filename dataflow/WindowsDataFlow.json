@@ -1,0 +1,42 @@
+{
+	"name": "WindowsDataFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_EmployeeInfoWithDepName",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeInforwithDepname"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Output_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Output_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Window1"
+				},
+				{
+					"name": "Window2"
+				}
+			],
+			"script": "source(output(\n\t\tEno as integer,\n\t\tEname as string,\n\t\tGender as string,\n\t\tSal as integer,\n\t\tDepname as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> EmployeeInforwithDepname\nEmployeeInforwithDepname window(over(Depname),\n\tasc(Sal, true),\n\tAvgSalary = avg(Sal)) ~> Window1\nEmployeeInforwithDepname window(over(Depname),\n\tasc(Sal, true),\n\tDenseRank = denseRank()) ~> Window2\nWindow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['WindowsTransOut_AvgSal'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tEno,\n\t\tEname,\n\t\tGender,\n\t\tSal,\n\t\tDepname,\n\t\tAvgSalary\n\t),\n\tpartitionBy('hash', 1)) ~> sink1\nWindow2 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['WindowTranOut_DesnseRank'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tEno,\n\t\tEname,\n\t\tGender,\n\t\tSal,\n\t\tDepname,\n\t\tDenseRank\n\t),\n\tpartitionBy('hash', 1)) ~> sink2"
+		}
+	}
+}

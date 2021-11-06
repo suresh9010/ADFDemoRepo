@@ -1,0 +1,22 @@
+{
+	"name": "Datset_TabnameDatabase",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LinkedService_Database",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "tablename",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "tabname"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

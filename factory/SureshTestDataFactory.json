@@ -1,0 +1,9 @@
+{
+	"name": "SureshTestDataFactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "067a864d-f83d-48c3-adc3-eacc6a0b5491",
+		"tenantId": "371531e1-52c0-491f-b164-1124edbf0b53"
+	}
+}

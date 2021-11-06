@@ -1,0 +1,42 @@
+{
+	"name": "PivotDataFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_EmployeeInfo",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeInfo"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_EmployeeDepDetails",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Output_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Pivot1"
+				},
+				{
+					"name": "Join1"
+				}
+			],
+			"script": "source(output(\n\t\tEno as string,\n\t\tEname as string,\n\t\tGender as string,\n\t\tSal as string,\n\t\tDepId as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> EmployeeInfo\nsource(output(\n\t\tDepId as string,\n\t\tDepName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nJoin1 pivot(groupBy(DepName),\n\tpivotBy(Gender),\n\t{} = count(Eno),\n\tcolumnNaming: 'Total_$N$V_Employees',\n\tlateral: true) ~> Pivot1\nEmployeeInfo, source1 join(EmployeeInfo@DepId == source1@DepId,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Join1\nPivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['Pivot_Output'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> sink1"
+		}
+	}
+}
